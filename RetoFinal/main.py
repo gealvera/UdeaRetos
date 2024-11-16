@@ -1,78 +1,64 @@
 from sklearn.model_selection import train_test_split
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
-from sklearn.feature_extraction import DictVectorizer
-from fastapi import FastAPI, Body, HTTPException
+from fastapi import FastAPI, Query
 from fastapi.responses import HTMLResponse, JSONResponse
 
-# 1: PRIORIZADO, 0: NO PRIORIZADO
+# Datos de ejemplo
 data = [
-    {"INGMEN": 1000000, "ESTSOC": 1, "COSMEN": 10000, "PRIORIDAD": 0},
-    {"INGMEN": 1000000, "ESTSOC": 1, "COSMEN": 20000, "PRIORIDAD": 0},
-    {"INGMEN": 1000000, "ESTSOC": 1, "COSMEN": 30000, "PRIORIDAD": 0},
-    {"INGMEN": 1000000, "ESTSOC": 1, "COSMEN": 40000, "PRIORIDAD": 1},
     {"INGMEN": 1000000, "ESTSOC": 1, "COSMEN": 50000, "PRIORIDAD": 1},
-    {"INGMEN": 1000000, "ESTSOC": 1, "COSMEN": 60000, "PRIORIDAD": 1},
-    {"INGMEN": 1000000, "ESTSOC": 1, "COSMEN": 70000, "PRIORIDAD": 1},
-    {"INGMEN": 1000000, "ESTSOC": 1, "COSMEN": 80000, "PRIORIDAD": 1},
-    {"INGMEN": 1000000, "ESTSOC": 1, "COSMEN": 90000, "PRIORIDAD": 1},
-    {"INGMEN": 1000000, "ESTSOC": 2, "COSMEN": 50000, "PRIORIDAD": 1},
-    {"INGMEN": 1000000, "ESTSOC": 2, "COSMEN": 60000, "PRIORIDAD": 0},
-    {"INGMEN": 1000000, "ESTSOC": 2, "COSMEN": 70000, "PRIORIDAD": 0},
-    {"INGMEN": 1000000, "ESTSOC": 2, "COSMEN": 80000, "PRIORIDAD": 1},
-    {"INGMEN": 1000000, "ESTSOC": 2, "COSMEN": 90000, "PRIORIDAD": 1},
-    {"INGMEN": 2000000, "ESTSOC": 3, "COSMEN": 50000, "PRIORIDAD": 0}
+    {"INGMEN": 1500000, "ESTSOC": 2, "COSMEN": 60000, "PRIORIDAD": 1},
+    {"INGMEN": 2000000, "ESTSOC": 3, "COSMEN": 70000, "PRIORIDAD": 1},
+    {"INGMEN": 1800000, "ESTSOC": 2, "COSMEN": 55000, "PRIORIDAD": 1},
+    {"INGMEN": 1200000, "ESTSOC": 1, "COSMEN": 65000, "PRIORIDAD": 1},
+    {"INGMEN": 2500000, "ESTSOC": 3, "COSMEN": 80000, "PRIORIDAD": 1},
+    {"INGMEN": 2800000, "ESTSOC": 1, "COSMEN": 50000, "PRIORIDAD": 1},
+    {"INGMEN": 2200000, "ESTSOC": 2, "COSMEN": 60000, "PRIORIDAD": 1},
+    {"INGMEN": 1500000, "ESTSOC": 3, "COSMEN": 90000, "PRIORIDAD": 1},
+    {"INGMEN": 2000000, "ESTSOC": 1, "COSMEN": 75000, "PRIORIDAD": 1},
+    {"INGMEN": 3500000, "ESTSOC": 1, "COSMEN": 50000, "PRIORIDAD": 0},
+    {"INGMEN": 4000000, "ESTSOC": 2, "COSMEN": 60000, "PRIORIDAD": 0},
+    {"INGMEN": 4500000, "ESTSOC": 3, "COSMEN": 45000, "PRIORIDAD": 0},
+    {"INGMEN": 2000000, "ESTSOC": 4, "COSMEN": 50000, "PRIORIDAD": 0},
+    {"INGMEN": 2500000, "ESTSOC": 5, "COSMEN": 60000, "PRIORIDAD": 0},
+    {"INGMEN": 3000000, "ESTSOC": 6, "COSMEN": 45000, "PRIORIDAD": 0},
+    {"INGMEN": 1000000, "ESTSOC": 1, "COSMEN": 30000, "PRIORIDAD": 0},
+    {"INGMEN": 2000000, "ESTSOC": 2, "COSMEN": 20000, "PRIORIDAD": 0},
+    {"INGMEN": 1500000, "ESTSOC": 3, "COSMEN": 35000, "PRIORIDAD": 0},
+    {"INGMEN": 3200000, "ESTSOC": 1, "COSMEN": 55000, "PRIORIDAD": 0},
 ]
 
-# Lista de variables
-X = [{k: v for k, v in item.items() if k != "PRIORIDAD"} for item in data] 
+# Separar características y etiquetas
+X = [[item["INGMEN"], item["ESTSOC"], item["COSMEN"]] for item in data]
 y = [item["PRIORIDAD"] for item in data]
 
-# Vectorizamos la X en un arreglo 2D
-vectorizer = DictVectorizer(sparse=False)
-X_vectorized = vectorizer.fit_transform(X) 
+# Dividir datos en conjuntos de entrenamiento y prueba
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-X_train, X_test, y_train, y_test = train_test_split(X_vectorized, y, test_size=0.2, random_state=42)
-
-# Crear el clasificador de vecinos mas cercanos
-knn = KNeighborsClassifier(n_neighbors=3)
+# Crear el clasificador Random Forest
+rf = RandomForestClassifier(class_weight='balanced', random_state=42)
 
 # Entrenar el clasificador
-knn.fit(X_train, y_train)
+rf.fit(X_train, y_train)
 
-# Predecir las etiquetas para los datos de prueba
-y_pred = knn.predict(X_test)
-
-# Calcular la precisión del clasificador
+# Evaluar el modelo
+y_pred = rf.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 
 print("Precisión:", accuracy)
 
-# Crea una instancia de FastAPI
+# FastAPI
 app = FastAPI()
-app.title = "Identificación de Hogares Vulnerables para la priorización de acceso a energías limpias"
+app.title = "Identificación de Hogares Vulnerables para Energías Limpias"
 app.version = "1.0.0"
 
-# Definie una ruta para la API
-@app.get('/', tags=['Home'])
-def message():
-    return HTMLResponse('<h1>¡Bienvenido a nuestra aplicación!!!</h1>')
+@app.get("/", tags=["Home"])
+def home():
+    return HTMLResponse("<h1>¡Bienvenido a nuestra aplicación de priorización de viviendas para energías limpias!</h1>")
 
-@app.get('/datosviviendas', tags=['Datos Viviendas'])
-def get_datos_viviendas():
-    if not data:
-        raise HTTPException(status_code=500, detail="NO hay datos disponibles.")
-    return data
-
-@app.get('/simulador', tags=['Simulador'])
-def get_simulador(Ingresos: int, Estrato: int, Costo: int):
-    new_data = {"INGMEN": Ingresos, "ESTSOC": Estrato, "COSMEN": Costo}
-    data_vectorized_test = vectorizer.transform([new_data])
-    prediction = knn.predict(data_vectorized_test)
-
-    # Convertir la predicción en un formato adecuado para JSON
-    prediction_label = "Si priorizado" if prediction[0] == 1 else "No priorizado"
-
+@app.get("/simulador", tags=["Simulador"])
+def get_simulador(Ingresos: int = Query(...), Estrato: int = Query(...), Costo: int = Query(...)):
+    new_data = [[Ingresos, Estrato, Costo]]
+    prediction = rf.predict(new_data)
+    prediction_label = "Sí priorizado" if prediction[0] == 1 else "No priorizado"
     return JSONResponse(content={"Predicción de Priorización": prediction_label})
-
-
