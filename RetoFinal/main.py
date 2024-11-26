@@ -99,7 +99,13 @@ def home():
             <input type="number" id="estrato" placeholder="Estrato Socioeconómico" required />
 
             <label for="costo">Costo Energía Mensual:</label>
-            <input type="number" id="costo" placeholder="Costo Energía Mensual" required />
+            <input 
+                type="text" 
+                id="costo" 
+                placeholder="Costo Energía Mensual" 
+                oninput="formatCurrency(this)" 
+            />
+
             <button type="submit">Simular Priorización</button>
         </form>
         <!-- Resultado de priorización -->
@@ -142,7 +148,9 @@ def home():
                 const ingresos = ingresosField.value.replace(/\D/g, ""); // Eliminar formato de moneda para obtener solo el número
 
                 const estrato = document.getElementById("estrato").value;
-                const costo = document.getElementById("costo").value;
+
+                const costoField = document.getElementById("costo");
+                const costo = costoField.value.replace(/\D/g, ""); // Eliminar formato de moneda para obtener solo el número
 
                 // Enviar la solicitud al servidor
                 const response = await fetch(`/simulador?Ingresos=${ingresos}&Estrato=${estrato}&Costo=${costo}`);
