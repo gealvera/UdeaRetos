@@ -2,8 +2,14 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from fastapi import FastAPI, Query
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
+from fastapi.templating import Jinja2Templates
+from fastapi.requests import Request
 from fastapi.staticfiles import StaticFiles
+import pandas as pd
+
+# Historial de resultados simulados
+historial_simulaciones = []
 
 # Datos de ejemplo
 data = [
@@ -72,143 +78,28 @@ app.version = "1.0.0"
 app.mount("/images", StaticFiles(directory="images"), name="images")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-@app.get("/", tags=["Home"])
-def home():
-    html_content = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Simulador de Priorización de Energías Limpias</title>
-        <link rel="stylesheet" type="text/css" href="/static/styles.css">
-    </head>
-    <body>
-        <h1>Simulador de Energías Limpias</h1>
-        <!-- Primer formulario -->
-        <form id="form-priorizacion" class="formulario" onsubmit="simulatePriorizacion(event)">
-            <h3>Formulario de Priorización</h3>
-            <label for="ingresos">Ingresos Mensuales:</label>
-            <input 
-                type="text" 
-                id="ingresos" 
-                placeholder="Ingresos Mensuales" 
-                required 
-                oninput="formatCurrency(this)" 
-            />
+# Configura el directorio de plantillas
+templates = Jinja2Templates(directory="templates")
 
-            <label for="estrato">Estrato Socioeconómico:</label>
-            <input type="number" id="estrato" placeholder="Estrato Socioeconómico" required />
-
-            <label for="costo">Costo Energía Mensual:</label>
-            <input 
-                type="text" 
-                id="costo" 
-                placeholder="Costo Energía Mensual" 
-                oninput="formatCurrency(this)" 
-            />
-
-            <button type="submit">Simular Priorización</button>
-        </form>
-        <!-- Resultado de priorización -->
-        <div id="priorizacion-result" style="display: none;">
-            <h2 id="priorizacion-message"></h2>
-        </div>
-        <!-- Segundo formulario -->
-        <form id="form-energia" class="formulario" onsubmit="simulateEnergia(event)" style="display: none;">
-            <h3>Formulario de Energía Limpia</h3>
-            <label for="radiacion">Radiación Solar (kWh/m²):</label>
-            <input type="number" step="0.1" id="radiacion" placeholder="Radiación Solar (kWh/m²)" required />
-
-            <label for="viento">Velocidad del Viento (m/s):</label>
-            <input type="number" step="0.1" id="viento" placeholder="Velocidad del Viento (m/s)" required />
-            <button type="submit">Simular Energía Limpia</button>
-        </form>
-        <h2 id="energia-message" style="margin-top: 20px;"></h2>
-
-        <script>
-            function formatCurrency(input) {
-                // Eliminar caracteres no numéricos
-                let value = input.value.replace(/\D/g, "");
-                
-                // Formatear como moneda
-                value = new Intl.NumberFormat("es-CO", {
-                    style: "currency",
-                    currency: "COP",
-                    minimumFractionDigits: 0
-                }).format(value);
-                
-                // Actualizar el valor del campo de entrada
-                input.value = value;
-            }
-
-            async function simulatePriorizacion(event) {
-                event.preventDefault();
-
-                // Obtener y procesar el valor del campo "ingresos"
-                const ingresosField = document.getElementById("ingresos");
-                const ingresos = ingresosField.value.replace(/\D/g, ""); // Eliminar formato de moneda para obtener solo el número
-
-                const estrato = document.getElementById("estrato").value;
-
-                const costoField = document.getElementById("costo");
-                const costo = costoField.value.replace(/\D/g, ""); // Eliminar formato de moneda para obtener solo el número
-
-                // Enviar la solicitud al servidor
-                const response = await fetch(`/simulador?Ingresos=${ingresos}&Estrato=${estrato}&Costo=${costo}`);
-                const result = await response.json();
-
-                // Actualizar los mensajes y mostrar el segundo formulario si aplica
-                const message = document.getElementById("priorizacion-message");
-                const resultDiv = document.getElementById("priorizacion-result");
-                const energiaForm = document.getElementById("form-energia");
-
-                // Reiniciar estados previos
-                resultDiv.style.display = "block";
-                message.textContent = result["Predicción de Priorización"];
-                message.className = ""; // Limpia clases previas
-
-                // Asignar clases según el resultado
-                if (result["Predicción de Priorización"] === "Sí Priorizado") {
-                    message.classList.add("si");
-                    energiaForm.style.display = "block"; // Mostrar el segundo formulario
-                } else {
-                    message.classList.add("no");
-                }
-            }
-
-            async function simulateEnergia(event) {
-                event.preventDefault();
-
-                // Obtener los valores del formulario
-                const radiacion = document.getElementById("radiacion").value;
-                const viento = document.getElementById("viento").value;
-
-                // Enviar la solicitud al servidor
-                const response = await fetch(`/energia?Radiacion=${radiacion}&Viento=${viento}`);
-                const result = await response.json();
-
-                // Mostrar el mensaje de energía recomendada
-                const energiaMessage = document.getElementById("energia-message");
-                energiaMessage.textContent = `Energía Recomendada: ${result["Energía Recomendada"]}`;
-                energiaMessage.className = ""; // Limpia clases previas
-
-                // Asignar clases según el tipo de energía
-                if (result["Energía Recomendada"] === "Solar") {
-                    energiaMessage.classList.add("solar");
-                } else if (result["Energía Recomendada"] === "Eólica") {
-                    energiaMessage.classList.add("eolica");
-                }
-            }
-        </script>
-    </body>
-    </html>
-    """
-    return HTMLResponse(content=html_content)
+@app.get("/", response_class=HTMLResponse, tags=["Home"])
+async def home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/simulador", tags=["Simulador"])
 def get_simulador(Ingresos: int = Query(...), Estrato: int = Query(...), Costo: int = Query(...)):
     new_data = [[Ingresos, Estrato, Costo]]
     prediction = rf.predict(new_data)
     prediction_label = "Sí Priorizado" if prediction[0] == 1 else "No Priorizado"
+
+    # Guardar en el historial
+    resultado = {
+        "Ingresos": Ingresos,
+        "Estrato": Estrato,
+        "Costo": Costo,
+        "Prioridad": prediction_label,
+    }
+    historial_simulaciones.append(resultado)
+
     return JSONResponse(content={"Predicción de Priorización": prediction_label})
 
 @app.get("/energia", tags=["Energía Limpia"])
@@ -216,4 +107,42 @@ def get_energia(Radiacion: float = Query(...), Viento: float = Query(...)):
     new_data = [[Radiacion, Viento]]
     prediction = rf_energia.predict(new_data)
     prediction_label = "Solar" if prediction[0] == 1 else "Eólica"
+
+    # Guardar en el historial
+    resultado = {
+        "Radiación": Radiacion,
+        "Velocidad Viento": Viento,
+        "Energía Recomendada": prediction_label,
+    }
+    # Modificar el último registro del historial
+    if historial_simulaciones:  
+        historial_simulaciones[-1].update({
+            "Radiación": Radiacion,
+            "Velocidad Viento": Viento,
+            "Energía Recomendada": prediction_label,
+        })
+
     return JSONResponse(content={"Energía Recomendada": prediction_label})
+
+@app.get("/exportar", tags=["Exportar"])
+def exportar_datos():
+    if not historial_simulaciones:
+        return JSONResponse(
+            content={"error": "No hay resultados para exportar."}, status_code=400
+        )
+
+    # Crear un DataFrame de pandas con el historial
+    df = pd.DataFrame(historial_simulaciones)
+
+    # Definir el archivo temporal para guardar el Excel
+    excel_path = "historial_resultados.xlsx"
+
+    # Guardar el DataFrame como archivo Excel
+    df.to_excel(excel_path, index=False, engine="openpyxl")
+
+    # Devolver el archivo como respuesta
+    return FileResponse(
+        path=excel_path,
+        filename="historial_resultados.xlsx",
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
