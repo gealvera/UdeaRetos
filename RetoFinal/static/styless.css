@@ -42,7 +42,7 @@ label {
 }
 
 .hidden {
-    display: none; /* Ocultar inicialmente */
+    display: none !important; /* Ocultar inicialmente */
 }
 
 /* Campos de Entrada */

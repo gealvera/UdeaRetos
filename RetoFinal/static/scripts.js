@@ -73,8 +73,6 @@ async function simulateEnergia(event) {
 
     // Mostrar el mensaje de energía recomendada
     const energiaMessage = document.getElementById("energia-message");
-    const energiaDiv = document.getElementById("energia-result");
-    energiaDiv.style.display = "block";
     energiaMessage.textContent = `Energía Recomendada: ${result["Energía Recomendada"]}`;
     energiaMessage.className = ""; // Limpia clases previas  
 
@@ -94,6 +92,7 @@ async function exportarExcel() {
 }
 
 function nuevaSimulacion() {
+
     // Limpiar los campos de los formularios
     document.getElementById("ingresos").value = "";
     document.getElementById("estrato").value = "";
@@ -102,23 +101,35 @@ function nuevaSimulacion() {
     document.getElementById("viento").value = "";
 
     // Limpiar los mensajes y resultados
-    document.getElementById("priorizacion-result").style.display = "none";
-    const energiaResult = document.getElementById("energia-result");
-    energiaResult.style.display = "none";
-    energiaResult.querySelector("#energia-message").textContent = "";
+    const priorizacionResult = document.getElementById("priorizacion-result");
+    const priorizacionMessage = document.getElementById("priorizacion-message");
+    const energiaMessage = document.getElementById("energia-message");
+
+    priorizacionResult.style.display = "none"; // Ocultar el contenedor de priorización
+    if (priorizacionMessage) {
+        priorizacionMessage.textContent = ""; // Limpiar texto
+        priorizacionMessage.className = "";
+    }
+    if (energiaMessage) {
+        energiaMessage.textContent = ""; // Limpiar texto de energía
+        energiaMessage.className = "";
+    }
 
     // Habilitar los botones
     const btnPriorizacion = document.querySelector("#form-priorizacion button[type='submit']");
-    btnPriorizacion.disabled = false;
+    if (btnPriorizacion) btnPriorizacion.disabled = false;
 
     const btnEnergia = document.querySelector("#form-energia button[type='submit']");
-    btnEnergia.disabled = false;
+    if (btnEnergia) btnEnergia.disabled = false;
 
     // Ocultar el botón Nueva Simulación
-    document.getElementById("nueva-simulacion").style.display = "none";
+    const nuevaSimulacionButton = document.getElementById("nueva-simulacion");
+    if (nuevaSimulacionButton) nuevaSimulacionButton.style.display = "none";
 
-    // Reiniciar el formulario de energía (ocultarlo)
+    // Ocultar el formulario de energía
     const energiaForm = document.getElementById("form-energia");
-    energiaForm.style.display = "none"; // Ocultar el segundo formulario
-    energiaForm.classList.add("hidden");
+    if (energiaForm) {
+        energiaForm.style.display = "none"; // Ocultar con estilo inline
+        energiaForm.classList.add("hidden"); // Añadir clase para asegurar ocultamiento
+    }
 }
