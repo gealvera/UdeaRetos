@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Simulador de Priorización de Energías Limpias</title>
+        <link rel="stylesheet" type="text/css" href="/static/styless.css">
+        <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <h1>Simulador de Priorizacion Hogares Vulnerables</h1>
+        <div class="form-container">
+            <!-- Primer formulario -->
+            <form id="form-priorizacion" class="formulario" onsubmit="simulatePriorizacion(event)">
+                <label for="ingresos">Ingresos Mensuales:</label>
+                <input 
+                    type="text" 
+                    id="ingresos" 
+                    placeholder="Ingresos Mensuales" 
+                    required 
+                    oninput="formatCurrency(this)" 
+                />
+        
+                <label for="estrato">Estrato Socioeconómico:</label>
+                <input type="number" id="estrato" placeholder="Estrato Socioeconómico" required />
+        
+                <label for="costo">Costo Energía Mensual:</label>
+                <input 
+                    type="text" 
+                    id="costo" 
+                    placeholder="Costo Energía Mensual" 
+                    oninput="formatCurrency(this)" 
+                />
+        
+                <button type="submit">Simular Priorización</button>
+            </form>
+        
+            <!-- Segundo formulario -->
+            <form id="form-energia" class="formulario hidden" onsubmit="simulateEnergia(event)">
+                <label for="radiacion">Radiación Solar (kWh/m²):</label>
+                <input type="number" step="0.1" id="radiacion" placeholder="Radiación Solar (kWh/m²)" required />
+        
+                <label for="viento">Velocidad del Viento (m/s):</label>
+                <input type="number" step="0.1" id="viento" placeholder="Velocidad del Viento (m/s)" required />
+                <button type="submit">Simular Energía Limpia</button>
+            </form>
+        </div>
+
+        <!-- Resultado de priorización -->
+        <div id="priorizacion-result" style="display: none;">
+            <h2 id="priorizacion-message"></h2>
+            <h2 id="energia-message"></h2>
+        </div>
+
+        <button id="nueva-simulacion" style="display: none;" onclick="nuevaSimulacion()">Nueva Simulación</button>
+     
+        <button id="exportar" onclick="exportarExcel()">Exportar a Excel</button>
+
+        <script src="/static/scripts.js"></script>
+    </body>
+    </html>

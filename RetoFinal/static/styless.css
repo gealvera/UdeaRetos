@@ -1,0 +1,191 @@
+/* General */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    background-image: url('/images/energia.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+    color: #fff;
+}
+/* Etiquetas */
+label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+    color: #000;
+    text-align: left; /* Alineación del texto del label */
+}
+
+.form-container {
+    display: flex; /* Usar Flexbox */
+    flex-wrap: wrap; /* Apila en pantallas pequeñas */
+    justify-content: center; /* Centrar los formularios */
+    align-items: flex-start; /* Alinear arriba */
+    gap: 10px; /* Reducir el espacio entre formularios */
+    max-width: 90%; /* Limitar el ancho del contenedor */
+    margin: 20px auto; /* Centrar horizontalmente */
+}
+
+/* Formularios */
+.formulario {
+    flex: 1; /* Ambos formularios ocupan el mismo espacio */
+    max-width: 400px; /* Limitar el ancho */
+    min-width: 300px; /* Asegurar tamaño mínimo */
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+}
+
+.hidden {
+    display: none !important; /* Ocultar inicialmente */
+}
+
+/* Campos de Entrada */
+input {
+    margin: 10px 0;
+    padding: 10px;
+    width: calc(100% - 20px); /* Ajustar para que no exceda los bordes */
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+/* Botones */
+button {
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    width: 100%; /* Asegura que ocupen todo el ancho del formulario */
+    max-width: 400px; /* Limita el ancho */
+    margin: 10px auto; /* Centra los botones */
+    display: block; /* Asegura que sean elementos en bloque */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra para resaltar */
+}
+
+button:hover {
+    background: linear-gradient(45deg, #218838, #1e7e34);
+    transform: scale(1.05);
+}
+
+/* Contenedor de Resultados Generales */
+#priorizacion-result {
+    margin: 20px auto; /* Centrar horizontalmente */
+    max-width: 400px; /* Limitar el ancho */
+    padding: 15px 20px; /* Espaciado interno */
+    border-radius: 8px; /* Bordes redondeados */
+    font-size: 14px; /* Tamaño de fuente */
+    font-weight: bold; /* Negrita */
+    color: #fff; /* Texto blanco */
+    text-align: center; /* Texto centrado */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra ligera */
+    animation: fadeIn 0.5s ease-out; /* Animación suave */
+}
+
+/* Contenedor de Resultado Priorización: Estilo */
+#priorizacion-message.si {
+    background-color: #4caf50; /* Verde */
+    border: 2px solid #388e3c; /* Borde verde oscuro */
+}
+
+#priorizacion-message.no {
+    background-color: #f44336; /* Rojo */
+    border: 2px solid #d32f2f; /* Borde rojo oscuro */
+}
+
+/* Contenedor de Resultado Energía: Estilo */
+#energia-message.solar {
+    background-color: #ffa726; /* Naranja */
+    border: 2px solid #f57c00; /* Borde naranja oscuro */
+}
+
+#energia-message.eolica {
+    background-color: #42a5f5; /* Azul */
+    border: 2px solid #1976d2; /* Borde azul oscuro */
+}
+
+/* Hover Opcional para los Contenedores */
+#priorizacion-message:hover, #energia-message:hover {
+    transform: scale(1.03); /* Pequeño zoom */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Sombra más marcada */
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#nueva-simulacion, #exportar {
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    width: 90%; /* Para que mantengan un ancho consistente */
+    max-width: 400px;
+    margin: 10px auto; /* Centra los botones */
+    display: block;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Añade una sombra */
+}
+
+/* Botón Nueva Simulación */
+#nueva-simulacion {
+    background: linear-gradient(45deg, #ff7e5f, #feb47b); /* Gradiente naranja/rosa */
+}
+
+#nueva-simulacion:hover {
+    background: linear-gradient(45deg, #feb47b, #ff7e5f); /* Invertimos el gradiente */
+    transform: translateY(-2px); /* Pequeño movimiento hacia arriba */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Más sombra */
+}
+
+/* Botón Exportar a Excel */
+#exportar {
+    background: linear-gradient(45deg, #43cea2, #185a9d); /* Gradiente verde/azul */
+}
+
+#exportar:hover {
+    background: linear-gradient(45deg, #185a9d, #43cea2); /* Invertimos el gradiente */
+    transform: translateY(-2px); /* Pequeño movimiento hacia arriba */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Más sombra */
+}
+
+/* Botón Simular Priorización */
+#form-priorizacion button {
+    background: linear-gradient(45deg, #34a853, #0d7304); /* Gradiente verde oscuro */
+}
+
+#form-priorizacion button:hover {
+    background: linear-gradient(45deg, #0d7304, #34a853); /* Invertimos el gradiente */
+    transform: translateY(-2px); /* Pequeño movimiento hacia arriba */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Más sombra */
+}
+
+/* Botón Simular Energía Limpia */
+#form-energia button {
+    background: linear-gradient(45deg, #1e90ff, #1c73c4); /* Gradiente azul */
+}
+
+#form-energia button:hover {
+    background: linear-gradient(45deg, #1c73c4, #1e90ff); /* Invertimos el gradiente */
+    transform: translateY(-2px); /* Pequeño movimiento hacia arriba */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Más sombra */
+}
